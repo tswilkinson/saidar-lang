@@ -1,5 +1,5 @@
 main :: IO ()
-main = print "done"
+main = print "hello world"
 
 data Natural = Zero | Succ Natural
 
@@ -18,27 +18,18 @@ instance Show Natural where
   show (Succ n) = show n ++ "+"
 
 data Expression = Variable Natural
-                | Lambda Type Expression
+                | Lambda Expression Expression
                 | Application Expression Expression
-                | Let Type Expression Expression
-                | ForAll Expression
+                | Let Expression Expression Expression
+                | ArrowType Expression Expression
+                | Sigma Expression Expression
+                | Pair Expression Expression Expression
+                | DataType Natural
+                | Constructor Natural Natural
+                | Case Natural [Expression]
+                | Cast Expression Coercion
 
-data Type = TypeVariable Natural
-          | TypeLambda Type Type
-          | TypeApplication Expression Type
-          | TypeArrow Type Type
+data Coercion
 
-expression_type :: Expression -> Maybe Type
-expression_type = go []
-  where go :: [Type] -> Expression -> Maybe Type
-        go c (Variable n) = deeper c n
-          where deeper :: [Type] -> Natural -> Maybe Type
-                deeper [] _ = Nothing
-                deeper (t:_) Zero = Just t
-                deeper (_:ts) (Succ b) = deeper ts b
-        go c (Lambda t x) = fmap (TypeArrow t) (go (t:c) x)
-        go c (Application x f) = do
-          tx <- go c x
-          tf <- go c f
-          case tf of
-            TypeArrow a b -> Nothing
+type_of_expression :: Expression -> Either String Expression
+type_of_expression (Variable n) = go n

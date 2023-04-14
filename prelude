@@ -1,0 +1,31 @@
+data Nat = Unit Zero
+         | Nat Succ
+
+add : (Nat *> Nat) -> Nat
+add = case>
+  (() Zero; n) +> n
+  (m Succ; n) +> (m;n) add Succ
+
+multiply : (Nat *> Nat) -> Nat
+multiply = case>
+  (() Zero; _) +> () Zero
+  (m Succ; n) +> (m;(m;n) multiply) add
+
+data (A : Type) List = Unit Empty
+                     | (A *> A List) Cons
+
+map : (A;B;f):(A : Type *> B : Type *> A -> B) -> A List -> B List
+(A;B;f) map = case>
+  () Empty +> () Empty
+  (x;xs) Cons +> (x f;xs ((A;B;f) map)) Cons
+
+concatenate : (A : Type) -> A List List -> A List
+A concatenate = case>
+  () Empty +> () Empty
+  (() Empty;xss) Cons +> xss (A concatenate)
+  ((x;xs) Cons;xss) Cons +> (x;(xs;xss) (A concatenate)) Cons
+
+length : (A : Type) -> A List -> Nat
+A length = case>
+  () Empty +> () Zero
+  (_;xs) Cons +> xs length Succ
