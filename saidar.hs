@@ -18,18 +18,11 @@ instance Show Natural where
   show (Succ n) = show n ++ "+"
 
 data Expression = Variable Natural
-                | Lambda Expression Expression
+                | Lambda Expression
                 | Application Expression Expression
-                | Let Expression Expression Expression
+                | Let Expression [(Pattern,Expression)] Expression
                 | ArrowType Expression Expression
                 | Sigma Expression Expression
                 | Pair Expression Expression Expression
-                | DataType Natural
-                | Constructor Natural Natural
-                | Case Natural [Expression]
-                | Cast Expression Coercion
 
-data Coercion
-
-type_of_expression :: Expression -> Either String Expression
-type_of_expression (Variable n) = go n
+data Pattern
